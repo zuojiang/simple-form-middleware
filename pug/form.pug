@@ -1,0 +1,63 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width,initial-scale=1,user-scalable=no')
+    meta(http-equiv='Progma' content='no-cache')
+    meta(http-equiv='Cache-Control' content='no-cache')
+    meta(http-equiv='Expires' content='0')
+    link(type='text/css' rel='stylesheet' href=`${baseUrl}/bootstrap3/css/bootstrap.min.css`)
+    link(type='text/css' rel='stylesheet' href=`${baseUrl}/bootstrap3/css/bootstrap-theme.min.css`)
+    title= title
+  body
+    div(class='modal-dialog')
+      form(class='modal-content' action=action method=method enctype=enctype)
+        div(class='modal-header')
+          h4(class='modal-title')= title || `[${method.toUpperCase()}] ${action}`
+        div(class='modal-body')
+          if error
+            div(class='alert alert-danger')= error
+          div(class='form-horizontal')
+            each v in fields
+              case v.type
+                when 'captacha'
+                  div(class='form-group')
+                    span(class='col-sm-3 control-label')= v['data-label'] || v.name
+                    div(class='col-sm-4')
+                      input(class='form-control')&attributes(v)
+                    div(class='col-sm-5')
+                      img(src=v['data-url'] alt=v['data-url'] onclick='this.src=this.src' style={cursor: 'pointer'})
+                when 'textarea'
+                  div(class='form-group')
+                    span(class='col-sm-3 control-label')= v['data-label'] || v.name
+                    div(class='col-sm-9')
+                      textarea(class='form-control')&attributes(v)
+                when 'checkbox'
+                when 'radio'
+                  div(class='form-group')
+                    div(class='col-sm-3')
+                    div(class='col-sm-9')
+                      label(class=`${v.type}-inline`)
+                        input&attributes(v)
+                        = v['data-label'] || v.value
+                when 'select'
+                  div(class='form-group')
+                    span(class='col-sm-3 control-label')= v['data-label'] || v.name
+                    div(class='col-sm-9')
+                      select(class='form-control')&attributes(v)
+                        each k in optionMap[v.name]
+                          option(value=k.value selected=v.value===k.value)= k.label
+                when 'file'
+                when 'range'
+                when 'color'
+                  div(class='form-group')
+                    span(class='col-sm-3 control-label')= v['data-label'] || v.name
+                    div(class='col-sm-9')
+                      input&attributes(v)
+                default
+                  div(class='form-group')
+                    span(class='col-sm-3 control-label')= v['data-label'] || v.name
+                    div(class='col-sm-9')
+                      input(class='form-control')&attributes(v)
+        div(class='modal-footer')
+          button(type='submit' class='btn btn-primary') OK
