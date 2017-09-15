@@ -1,6 +1,6 @@
 {
   "name": "simple-form-middleware",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple form middleware.",
   "main": "lib/index.js",
   "scripts": {

@@ -54,6 +54,8 @@ html
                     span(class='col-sm-3 control-label')= v['data-label'] || v.name
                     div(class='col-sm-9')
                       input&attributes(v)
+                when 'hidden'
+                  input&attributes(v)
                 default
                   div(class='form-group')
                     span(class='col-sm-3 control-label')= v['data-label'] || v.name
