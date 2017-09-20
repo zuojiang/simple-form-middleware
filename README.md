@@ -17,6 +17,7 @@ const app = connect()
 
 app.use('/auth', createForm({
   action: '/login',
+  method: 'post',
   fieldset: [
     {
       name: 'user_name',
@@ -30,12 +31,32 @@ app.use('/auth', createForm({
       'data-label': 'Password',
     },
     {
+      type: 'select',
+      name: 'role',
+      value: '1',
+    },
+    {
       name: 'code',
       type: 'captacha',
       'data-url': '/auth/test.png',
       required: true,
     },
-  ]
+  ],
+  selectOptions: {
+    role: [{
+      value: '1',
+      label: 'Admin',
+    }, {
+      value: '2',
+      label: 'Guest',
+    }],
+  },
+  headers: {
+    'X-Requested-With': 'Fetch',
+  },
+  callbackStr: `function(err, text) {
+    alert(err ? err.message : text)
+  }`,
 ))
 
 app.listen(3000)

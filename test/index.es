@@ -1,5 +1,9 @@
 import connect from 'connect'
 import proxy from 'http-proxy-middleware'
+import Busboy from 'busboy'
+import path from 'path'
+import os from 'os'
+import fs from 'fs'
 
 import createForm from '../src/index'
 
@@ -18,8 +22,40 @@ app.use('/', (req, res, next) => {
   next()
 })
 
+app.use('/login', (req, res) => {
+  const {headers} = req
+  console.dir(headers)
+  const busboy = new Busboy({
+    headers,
+  })
+
+  busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+    console.log(fieldname, filename)
+    file.pipe(fs.createWriteStream(path.join(os.tmpDir(), path.basename(fieldname))))
+  })
+
+  busboy.on('field', (fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) => {
+    console.log(fieldname, val)
+  })
+
+  busboy.on('finish', () => {
+    res.writeHead(200, { 'Connection': 'close' })
+    res.end('ok')
+  })
+
+  req.pipe(busboy)
+
+})
+
 app.use('/auth', createForm({
+  callbackStr: `function(err, text) {
+    alert(err ? err.message : text)
+  }`,
+  headers: {
+    'X-Requested-With': 'Fetch',
+  },
   action: '/login',
+  // method: 'get',
   fieldset: [
     {
       name: 'user_name',
@@ -40,7 +76,7 @@ app.use('/auth', createForm({
     },
     {
       type: 'select',
-      name: 'sex',
+      name: 'role',
       value: '1',
     },
     {
@@ -53,16 +89,20 @@ app.use('/auth', createForm({
       required: true,
       'data-label': 'I confirm!',
     },
+    // {
+    //   type: 'file',
+    //   name: 'attaches'
+    // },
   ],
-  optionMap: {
-    sex: [{
+  selectOptions: {
+    role: [{
       value: '1',
-      label: 'Male',
+      label: 'Admin',
     }, {
       value: '2',
-      label: 'Female',
-    }]
-  }
+      label: 'Guest',
+    }],
+  },
 }))
 
 app.use('/', proxy({

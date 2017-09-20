@@ -12,7 +12,9 @@ export default function ({
   method = 'post',
   enctype,
   fieldset = [],
-  optionMap = {},
+  selectOptions = {},
+  headers,
+  callbackStr,
 }) {
   if (!enctype) {
     enctype = fieldset.find(({type}) => type === 'file')
@@ -59,6 +61,17 @@ export default function ({
         }
       })
 
+      if (headers) {
+        if (!callbackStr) {
+          callbackStr = `function(err, body){
+            document.write(err ? err.message : body)
+            document.close()
+          }`
+        }
+      } else {
+        headers = {}
+      }
+
       res.end(render({
         baseUrl: pathname,
         title,
@@ -67,7 +80,9 @@ export default function ({
         method,
         enctype,
         fields,
-        optionMap,
+        selectOptions,
+        headers,
+        callbackStr,
       }))
     })
   }

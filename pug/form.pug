@@ -8,10 +8,34 @@ html
     meta(http-equiv='Expires' content='0')
     link(type='text/css' rel='stylesheet' href=`${baseUrl}/bootstrap3/css/bootstrap.min.css`)
     link(type='text/css' rel='stylesheet' href=`${baseUrl}/bootstrap3/css/bootstrap-theme.min.css`)
+    style(type='text/css').
+      .modal-title {
+        overflow-wrap: break-word;
+        word-break: break-all;
+        word-wrap: break-word;
+      }
+    if callbackStr
+      script(type='text/javascript' src=`${baseUrl}/bundle.js`)
+      script(type='text/javascript').
+        function _onsubmit(evt) {
+          evt.preventDefault()
+          var form = evt.target
+          form.method = '#{method}'
+          var headers = !{JSON.stringify(headers)}
+          var callback = !{callbackStr}
+          submitByFetch(form, headers).then(function(res) {
+            return res.text()
+          }).then(function(text){
+            callback(null, text)
+          }, callback)
+        }
+    else
+      script(type='text/javascript').
+        function _onsubmit() {}
     title= title
   body
     div(class='modal-dialog')
-      form(class='modal-content' action=action method=method enctype=enctype)
+      form(class='modal-content' action=action method=method enctype=enctype onsubmit='_onsubmit(event)')
         div(class='modal-header')
           h4(class='modal-title')= title || `[${method.toUpperCase()}] ${action}`
         div(class='modal-body')
@@ -45,7 +69,7 @@ html
                     span(class='col-sm-3 control-label')= v['data-label'] || v.name
                     div(class='col-sm-9')
                       select(class='form-control')&attributes(v)
-                        each k in optionMap[v.name]
+                        each k in selectOptions[v.name]
                           option(value=k.value selected=v.value===k.value)= k.label
                 when 'file'
                 when 'range'
