@@ -1,4 +1,5 @@
 import connect from 'connect'
+import bodyParser from 'body-parser'
 import proxy from 'http-proxy-middleware'
 import Busboy from 'busboy'
 import path from 'path'
@@ -22,9 +23,18 @@ app.use('/', (req, res, next) => {
   next()
 })
 
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+
 app.use('/login', (req, res) => {
-  const {headers} = req
-  console.dir(headers)
+  const {headers, method, body} = req
+
+  console.dir({
+    headers,
+    method,
+    body,
+  })
+
   const busboy = new Busboy({
     headers,
   })

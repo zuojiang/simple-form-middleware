@@ -1,4 +1,5 @@
 import serialize from 'form-serialize'
+import urlencode from 'form-urlencoded'
 
 function submitByFetch(form, headers = {}) {
   let url = form.getAttribute('action')
@@ -6,7 +7,7 @@ function submitByFetch(form, headers = {}) {
   let enctype = form.getAttribute('enctype')
   let contentType = headers['Content-Type'] || headers['content-type']
   let body = {}
-  
+
   if (/^get$/i.test(method)) {
     url = url +'?'+ serialize(form)
   } else if (enctype === 'multipart/form-data') {
@@ -25,7 +26,11 @@ function submitByFetch(form, headers = {}) {
       hash: true,
     }))
   } else {
-    body = new FormData(form)
+    delete headers['content-type']
+    headers['Content-Type'] = contentType || 'application/x-www-form-urlencoded; charset=UTF-8'
+    body = urlencode(serialize(form, {
+      hash: true,
+    }))
   }
 
   return fetch(url, {
