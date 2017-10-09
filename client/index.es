@@ -34,6 +34,7 @@ function submitByFetch(form, headers = {}) {
   }
 
   return fetch(url, {
+    credentials: 'same-origin',
     method,
     headers,
     body,
