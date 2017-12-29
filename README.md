@@ -4,6 +4,8 @@
 
 A simple form middleware.
 
+![screenshot](https://raw.githubusercontent.com/zuojiang/simple-form-middleware/master/screenshots/screenshot-1.3.0.png)
+
 ### Usage
 ```sh
 $ npm install simple-form-middleware
@@ -52,11 +54,12 @@ app.use('/auth', createForm({
     }],
   },
   headers: {
-    'X-Requested-With': 'Fetch',
+    'Content-Type': 'application/json',
   },
   callbackStr: `function(err, text) {
     alert(err ? err.message : text)
   }`,
+  // externalScriptUrl: '/auth/printReqInfo.js',
 ))
 
 app.listen(3000)

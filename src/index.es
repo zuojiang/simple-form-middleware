@@ -8,13 +8,13 @@ const render = pug.compileFile(path.join(__dirname, '..', 'pug', 'form.pug'), {
 })
 
 export default function ({
-  action,
   method = 'post',
   enctype,
   fieldset = [],
   selectOptions = {},
   headers,
   callbackStr,
+  ...others,
 }) {
   if (!enctype) {
     enctype = fieldset.find(({type}) => type === 'file')
@@ -30,11 +30,6 @@ export default function ({
       const {
         locals = {},
       } = res
-
-      const {
-        title,
-        error,
-      } = locals
 
       const {
         pathname,
@@ -73,10 +68,9 @@ export default function ({
       }
 
       res.end(render({
+        ...locals,
+        ...others,
         baseUrl: pathname,
-        title,
-        error,
-        action,
         method,
         enctype,
         fields,

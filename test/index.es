@@ -17,8 +17,8 @@ app.use('/favicon.ico', (req, res) => {
 
 app.use('/', (req, res, next) => {
   res.locals = {
-    error: 'Please complete the following information!',
-    title: 'test',
+    title: 'Test',
+    infoMessage: 'Please complete the following information!',
   }
   next()
 })
@@ -26,14 +26,15 @@ app.use('/', (req, res, next) => {
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-app.use('/login', (req, res) => {
+app.use('/login', (req, res, next) => {
+  if (req.headers['content-type'] === 'multipart/form-data') {
+    return next()
+  }
+  console.log(req.method, req.body)
+  res.writeHead(200, { 'Connection': 'close' })
+  res.end('ok')
+}, (req, res) => {
   const {headers, method, body} = req
-
-  console.dir({
-    headers,
-    method,
-    body,
-  })
 
   const busboy = new Busboy({
     headers,
@@ -54,7 +55,6 @@ app.use('/login', (req, res) => {
   })
 
   req.pipe(busboy)
-
 })
 
 app.use('/auth', createForm({
@@ -62,7 +62,7 @@ app.use('/auth', createForm({
     alert(err ? err.message : text)
   }`,
   headers: {
-    'X-Requested-With': 'Fetch',
+    'Content-Type': 'application/json',
   },
   action: '/login',
   // method: 'get',
@@ -113,6 +113,7 @@ app.use('/auth', createForm({
       label: 'Guest',
     }],
   },
+  // externalScriptUrl: '/auth/printReqInfo.js',
 }))
 
 app.use('/', proxy({

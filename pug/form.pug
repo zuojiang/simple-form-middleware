@@ -14,16 +14,30 @@ html
         word-break: break-all;
         word-wrap: break-word;
       }
-    if callbackStr
+    if externalScriptUrl
+      script(type='text/javascript' src=`${baseUrl}/bundle.js`)
+      script(type='text/javascript').
+        function _onsubmit() {}
+      script(type='text/javascript' src=externalScriptUrl)
+    else if callbackStr
       script(type='text/javascript' src=`${baseUrl}/bundle.js`)
       script(type='text/javascript').
         function _onsubmit(evt) {
           evt.preventDefault()
-          var form = evt.target
-          form.method = '#{method}'
-          var headers = !{JSON.stringify(headers)}
+          
           var callback = !{callbackStr}
-          submitByFetch(form, headers).then(function(res) {
+          
+          var reqInfo = parseRequestInfo(evt.target, {
+            method: '#{method}',
+            headers: !{JSON.stringify(headers)}
+          })
+          
+          fetch(reqInfo.url, {
+            credentials: 'same-origin',
+            method: reqInfo.method,
+            headers: reqInfo.headers,
+            body: reqInfo.body
+          }).then(function(res) {
             return res.text()
           }).then(function(text){
             callback(null, text)
@@ -39,8 +53,10 @@ html
         div(class='modal-header')
           h4(class='modal-title')= title || `[${method.toUpperCase()}] ${action}`
         div(class='modal-body')
-          if error
-            div(class='alert alert-danger')= error
+          if errorMessage
+            div(class='alert alert-danger')= errorMessage
+          if infoMessage
+            div(class='alert alert-info')= infoMessage
           div(class='form-horizontal')
             each v in fields
               case v.type

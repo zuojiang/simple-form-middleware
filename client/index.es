@@ -1,9 +1,14 @@
 import serialize from 'form-serialize'
 import urlencode from 'form-urlencoded'
 
-function submitByFetch(form, headers = {}) {
+global.parseRequestInfo = function (form, {
+  method,
+  headers,
+} = {}) {
+  method = method || form.getAttribute('method')
+  headers = headers || {}
+
   let url = form.getAttribute('action')
-  let method = form.getAttribute('method')
   let enctype = form.getAttribute('enctype')
   let contentType = headers['Content-Type'] || headers['content-type']
   let body = {}
@@ -21,6 +26,8 @@ function submitByFetch(form, headers = {}) {
         body.append(input.name, input.value)
       }
     }
+    delete headers['content-type']
+    headers['Content-Type'] = enctype
   } else if (contentType === 'application/json') {
     body = JSON.stringify(serialize(form, {
       hash: true,
@@ -33,12 +40,10 @@ function submitByFetch(form, headers = {}) {
     }))
   }
 
-  return fetch(url, {
-    credentials: 'same-origin',
+  return {
+    url,
     method,
     headers,
     body,
-  })
+  }
 }
-
-global.submitByFetch = submitByFetch
