@@ -6,7 +6,9 @@ import path from 'path'
 import os from 'os'
 import fs from 'fs'
 
-import createForm from '../src/index'
+const dev = process.env.NODE_ENV !== 'production'
+
+const createForm = (dev ? require('../src') : require('../lib')).default
 
 const app = connect()
 
